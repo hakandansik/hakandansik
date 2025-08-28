@@ -1,4 +1,4 @@
-##### VERTICAL RESERVATION SYSTEM V3 #####
+##### VERTICAL RESERVATION SYSTEM V3.1 #####
 from flask import current_app
 from flask import Flask, render_template, request, redirect, flash, jsonify, session, url_for, send_file, send_from_directory
 from apscheduler.schedulers.background import BackgroundScheduler
