@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rezervasyon</title>
+    <img src="{{ url_for('static', filename='ispermecet.jpg') }}" alt="Logo" style="margin-left: 20px; width: 300px; height: auto;">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/i18n/datepicker-tr.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1> Rezervasyon</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert alert-success">
+            {% for category, message in messages %}
+            {{ message }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/submit">
+            <!-- Tarih Seçimi -->
+            <div class="mb-3">
+                <label for="tarih" class="form-label">Tarih Seçimi</label>
+                <input type="text" class="form-control" id="tarih" name="tarih" required>
+                <small class="form-text text-muted" id="kapasiteBilgi">Kapasite bilgisi burada görünecek.</small>
+            </div>
+
+            <!-- Ad Soyad -->
+            <div class="mb-3">
+                <label for="adsoyad" class="form-label">Ad Soyad</label>
+                <input type="text" class="form-control" id="adsoyad" name="adsoyad" required>
+            </div>
+
+            <!-- Cep Telefonu -->
+            <div class="mb-3">
+                <label for="telefon" class="form-label">Cep Telefonu</label>
+                <input type="number" class="form-control" id="telefon" name="telefon" required minlength="10" maxlength="11" placeholder="05XXXXXXXXX">
+            </div>
+
+            <!-- TC Kimlik Numarası -->
+            <div class="mb-3">
+                <label for="tckimlik" class="form-label">TC Kimlik Numarası</label>
+                <input type="number" class="form-control" id="tckimlik" name="tckimlik" required minlength="11" maxlength="11">
+            </div>
+
+            <!-- Doğum Tarihi -->
+            <div class="mb-3">
+                <label for="dogumtarihi" class="form-label">Doğum Tarihi</label>
+                <input type="text" class="form-control" id="dogumtarihi" name="dogumtarihi" required>
+            </div>
+
+            <!-- Adres -->
+            <div class="mb-3">
+                <label for="adres" class="form-label">Adres</label>
+                <input type="text" class="form-control" id="adres" name="adres" required>
+            </div>
+
+            <!-- Dalış Sertifikası -->
+            <div class="mb-3">
+                <label for="sertifika" class="form-label">Dalış Sertifikası</label>
+                <input type="text" class="form-control" id="sertifika" name="sertifika">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Rezervasyon Yap</button>
+        </form>
+    </div>
+
+    <script>
+        $(function() {
+            // Türkçe tarih seçici ayarları
+            $.datepicker.regional['tr'] = {
+                closeText: 'Kapat',
+                prevText: '&#x3C;Geri',
+                nextText: 'İleri&#x3E;',
+                currentText: 'Bugün',
+                monthNames: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
+                'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
+                monthNamesShort: ['Oca','Şub','Mar','Nis','May','Haz',
+                'Tem','Ağu','Eyl','Eki','Kas','Ara'],
+                dayNames: ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],
+                dayNamesShort: ['Pz','Pt','Sa','Ça','Pe','Cu','Ct'],
+                dayNamesMin: ['Pz','Pt','Sa','Ça','Pe','Cu','Ct'],
+                weekHeader: 'Hf',
+                dateFormat: 'dd/mm/yy',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: ''
+            };
+            $.datepicker.setDefaults($.datepicker.regional['tr']);
+
+            let doluGunler = [];
+        
+        
+
+            // Kapasitesi dolu olan günleri sunucudan al
+            $.ajax({
+                url: "/dolu_gunler",  // Flask rotası (bu rota dolu günleri dönecek)
+                method: "GET",
+                success: function(response) {
+                    doluGunler = response;  // Kapasitesi dolmuş günleri al
+                    initDatepicker();  // Takvimi başlat
+                }
+            });
+
+            function initDatepicker() {
+                // Tarih seçimleri için datepicker ekle
+                $("#tarih").datepicker({
+                    dateFormat: "dd/mm/yy",
+                    changeMonth: true,
+                    changeYear: true,
+                    beforeShowDay: function(date) {
+                        // Tarihi 'yyyy-mm-dd' formatına çevir
+                        let ymd = $.datepicker.formatDate('yy-mm-dd', date);
+                        
+                        // Dolu günleri kontrol et
+                        if (doluGunler.includes(ymd)) {
+                            // Dolu günler kırmızı renkte gösterilsin ve seçilemesin
+                            return [false, "dolu-gun", "Bu gün dolu"];
+                        }
+                        return [true, "", ""]; // Seçilebilir günler
+                    },
+                    onSelect: function(selectedDate) {
+                        $.ajax({
+                            url: "/kontrol_kapasite",
+                            method: "POST",
+                            contentType: "application/json",
+                            data: JSON.stringify({ tarih: selectedDate }),
+                            success: function(response) {
+                                var kapasiteBilgi = `${response.kayitli}/${response.kapasite} kişi kayıtlı. Müsait kişi sayısı: ${response.musait}`;
+                                $("#kapasiteBilgi").text(kapasiteBilgi);
+
+                                if (response.musait <= 0) {
+                                    alert("Bu tarihte yer kalmamıştır. Lütfen başka bir tarih seçin.");
+                                    $("#tarih").val('');
+
+                                }
+                                
+                                $("#kapasiteBilgi").text(kapasiteBilgi);
+                            }
+                        });
+                    }
+                });
+
+                $("#dogumtarihi").datepicker({
+                    dateFormat: "dd/mm/yy",
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "1900:" + new Date().getFullYear(), // 1900'den mevcut yıla kadar
+                    minDate: new Date(1900, 0, 1), // 1 Ocak 1900
+                    maxDate: new Date() // Bugünün tarihi
+                });
+            }
+        });
+    </script>
+
+    <style>
+        /* Dolu günlerin stilini tanımla */
+        .dolu-gun a {
+            background-color: red !important;
+            color: white !important;
+            pointer-events: none; /* Tıklanamaz yap */
+        }
+    </style>
+</body>
+</html>

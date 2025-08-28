@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rezervasyon Onayınız</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 25px;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #0d6efd; /* Mavi tonu */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+        .date-box {
+            background-color: #e9f5ff;
+            border-left: 5px solid #0d6efd;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            🐋 Vertical Dalış Merkezi
+        </div>
+        <div class="content">
+            <h3>Sevgili {{ bilgiler.adsoyad }},</h3>
+            
+            <p>Rezervasyonun tamamlandı! Derinliklerde keşfedeceğin her canlı, her mercan sana yepyeni bir hikâye fısıldayacak.</p>
+
+            <div class="date-box">
+                Seçilen Tur: <strong>{{ bilgiler.tur_bilgisi }}</strong><br>
+                📅 Tur Başlangıç Tarihi: <strong>{{ bilgiler.tarih }}</strong>
+            </div>
+
+            <p><em>Ufak bir tüyo: Su altı dostlarımız, poz verirken fazla kıpırdamazlar ama siz yine de flaş kullanmayın 📸</em></p>
+
+            <p>Denizin altında görüşmek üzere!</p>
+        </div>
+        
+        <div class="footer">
+            <p>Rezervasyon iptali ya da değişikliği için bizimle iletişime geçebilirsiniz.</p>
+            <p><a href="{{ url_for('rezervasyon_iptal_et', token=bilgiler.iptal_token, _external=True) }}">Rezervasyonumu İptal Et</a></p>
+            <p><strong>Vertical Dalış Merkezi</strong><br>
+            ☎️ 0 539 397 28 48</p>
+        </div>
+    </div>
+
+    </div>
+</body>
+</html>

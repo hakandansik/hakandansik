@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <title>Sahil Güvenlik Formu  – Önizleme</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- İsteğe bağlı: basit tipografi ve baskı uyumu -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <style>
+    :root { --fg:#111; --muted:#444; --border:#bbb; }
+    html,body{margin:0;padding:0;background:#fff;color:var(--fg);font:14px/1.4 "Segoe UI",system-ui,-apple-system,Arial;}
+    .container{max-width:900px;margin:24px auto;padding:0 16px;}
+    h1{font-size:20px;margin:0 0 8px;line-height: 1.2;}
+    h2{font-size:16px;margin:18px 0 8px;}
+    .sec{margin:12px 0 0;}
+    .sec p { margin: 4px 0; } /* Paragraflar arası boşluğu azalt */
+    .line{border-bottom:1px solid var(--border);margin:8px 0 12px;}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .label{min-width:260px;color:var(--muted)}
+    .val{font-weight:600}
+    .muted{color:var(--muted)}
+    table{width:100%;border-collapse:collapse;margin-top:8px;}
+    th,td{border:1px solid var(--border);padding:6px 8px;vertical-align:top}
+    th{background:#f5f5f5;text-align:left}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .btn{appearance:none;border:1px solid #1e3a8a;background:#1d4ed8;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .note{font-size:12px;color:#666;margin-top:6px}
+    @media print {.topbar{display:none}}
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <h1>SAHİL GÜVENLİK BİLGİ FORMU - Vertical Scuba Diving</h1>
+    <!-- Word indirme butonu -->
+    <button id="btnDownload" class="btn">İndir (PDF)</button>
+  </div>
+  <div class="line"></div>
+
+  <!-- 1 -->
+  <div class="sec">
+    <p><b> 1.</b> Turizm Amaçlı Sportif Faaliyet Belge No: <span class="val">1069</span></p>
+  </div>
+
+  <!-- 2 -->
+  <div class="sec">
+    <p><b> 2.</b> İlgili Federasyondan Alınmış Dalış Yetki Belgesi Tarihi ve No'su: <span class="val">1069</span></p>
+  </div>
+
+  <!-- 3 -->
+  <div class="sec">
+    <p><b> 3. </b> Dalışta kullanılacak malzemeler mevcut mu?: <span class="val">EVET</span></p>
+  </div>
+
+  <!-- 4 -->
+  <div class="sec">
+    <h2>4. Kullanılacak Parkur -Tekne/Yata ait bilgiler: </h2>
+    <p>Adı / Parkur / Yer + Tarih: <span class="val">{{ parkur_ve_tarih }}</span></p>
+    <p>Bayrağı: <span class="val"></span></p>
+    <p>Bağlama Limanı: <span class="val"></span></p>
+  </div>
+
+  <!-- 5 -->
+  <div class="sec">
+    <h2>5. Dalış Yapacak Grubun Sorumluları: </h2>
+    <p>Adı, Soyadı: <span class="val">BİLGE ŞEN, ERCÜMENT ŞEN</span></p>
+    <p>Milliyeti: <span class="val">TÜRKİYE CUMHURİYETİ</span></p>
+    <p>Diploma ve Belgenin Verildiği Yer: <span class="val">TSSF</span></p>
+    <p>Türkiye'de Bağlı olduğu Acente: <span class="val"></span></p>
+    <p>Türk Acente Sorumlusunun Adı/Soyadı: <span class="val"></span></p>
+  </div>
+
+  <!-- 6 -->
+  <div class="sec">
+    <h2>6. Sorumlu Türk Dalış Rehberinin</h2>
+    <p>Adı, Soyadı: <span class="val">ERCÜMENT ŞEN</span></p>
+    <p>Diploma ve Belgenin Verildiği Yer: <span class="val">TSSF</span></p>
+  </div>
+
+  <!-- 7 -->
+  <div class="sec">
+    <h2>7. Dalış Şekli</h2>
+    <table id="dalis_sekli">
+      <thead>
+        <tr>
+          <th style="width:20px">Techizatsiz: </th>	  
+          <td></td>          
+        </tr>
+      </thead>
+      <tbody>          
+        <tr>
+          <th style="width:20px">Techizatli: </th>
+          <td><b> EVET </b></td>         
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 8 -->
+  <div class="sec">
+    <h2>8. Gruptaki Dalgıçların Listesi</h2>
+    <table id="dalgic_tablosu">
+      <thead>
+        <tr>
+          <th style="width:70px">S.NO</th>
+          <th>ADI, SOYADI</th>
+          <th>BELGESİ</th>
+          <th>PASAPORT/T.C. NUMARASI</th>
+          <th>MİLLİYETİ</th>
+          <th>YAŞ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Şablondaki sabit iki satır -->
+        <tr>
+          <td>1</td>
+          <td>ERCÜMENT ŞEN</td>
+          <td>2*EĞT. REHBER</td>
+          <td>38213183920 T.C.</td>
+          <td>T.C.</td>
+          <td>43</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>BİLGE ŞEN</td>
+          <td>1*EĞT.</td>
+          <td>12394629422 T.C.</td>
+          <td>T.C.</td>
+          <td>43</td>
+        </tr>
+
+        <!-- Dinamik kayıtların ekleneceği satırlar (3’ten itibaren) -->
+        <!-- Örnek boş satırlar; JS ile çoğaltacağız -->
+        {% for participant in participants %}
+        <tr>
+          <td>{{ loop.index + 2 }}</td>
+          <td>{{ participant.ad }}</td>
+          <td>{{ participant.belgesi }}</td>
+          <td>{{ participant.tc }}</td>
+          <td>{{ participant.milliyet }}</td>
+          <td>{{ participant.yas }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+  </div>
+
+  <!-- 9 -->
+  <div class="sec">
+    <h2>9. Dalış Programı</h2>
+    <table id="dalis_programi">
+      <thead>
+        <tr>
+          <th style="width:70px">S.NO</th>
+          <th>DALIŞ TARİHİ</th>
+          <th>YERİ</th>
+          <th>SAAT</th>          
+        </tr>
+      </thead>
+      <tbody>        
+        <tr>
+          <td>1</td>
+          <td>{{ dalis_tarihi }}</td>
+          <td>{{ dalis_yeri }}</td>
+          <td>{{ dalis_saat }}</td>
+        </tr>
+      </tbody>
+    </table>
+        
+  </div>
+
+  <div class="line"></div>
+  <div class="muted">HİZMETE ÖZEL - INTERNAL</div>
+  <div class="muted">HİZMETE ÖZEL - INTERNAL</div>
+
+</div>
+
+<!-- Script to handle download button -->
+<script>
+  document.getElementById('btnDownload').addEventListener('click', function() {
+    // The tur_id is passed from the backend to the template
+    const turId = "{{ tur_id }}";
+    // Redirect to the Word download URL
+    window.location.href = `/sg_form_tur_pdf/${turId}`;
+  });
+</script>
+</body>
+</html>

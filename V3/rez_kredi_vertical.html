@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kredi Tanımla</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/i18n/datepicker-tr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white text-center">
+                <h4 class="mb-0">Kredi Tanımla</h4>
+            </div>
+            <div class="card-body">
+                <!-- Flashed Mesajlar -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST" id="krediForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" id="is_update" name="is_update" value="0" />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="tc_pasaport" class="form-label">TC/Pasaport No</label>
+                            <input type="text" class="form-control" id="tc_pasaport" name="tc_pasaport" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ad" class="form-label">Ad</label>
+                            <input type="text" class="form-control" id="ad" name="ad" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">E-Posta</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="kredi" class="form-label">Kredi</label>
+                            <input type="number" class="form-control" id="kredi" name="kredi" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="kredi_baslama" class="form-label">Kredi Başlama Tarihi</label>
+                            <input type="text" class="form-control" id="kredi_baslama" name="kredi_baslama" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="kredi_bitis" class="form-label">Kredi Bitiş Tarihi</label>
+                            <input type="text" class="form-control" id="kredi_bitis" name="kredi_bitis" required>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-end">
+                        <button type="submit" class="btn btn-success">Kaydet</button>
+                        <a href="{{ url_for('rezervasyon_list') }}" class="btn btn-secondary">İptal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-5 shadow-sm">
+            <div class="card-header bg-secondary text-white text-center">
+                <h5 class="mb-0">Kredi Tanımlı Kullanıcılar</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sıra</th>
+                                <th>Ad</th>
+                                <th>TC/Pasaport No</th>
+                                <th>E-Posta</th>
+                                <th>Kredi</th>
+                                <th>Başlama</th>
+                                <th>Bitiş</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for kredi in kredi_listesi %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ kredi.AD }}</td>
+                                <td>{{ kredi.TC_PASAPORT }}</td>
+                                <td>{{ kredi.EMAIL }}</td>
+                                <td>{{ kredi.KREDI }}</td>
+                                <td>{{ kredi.KREDI_BASLAMA }}</td>
+                                <td>{{ kredi.KREDI_BITIS }}</td>
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-sm btn-primary btn-guncelle"
+                                            data-ad="{{ kredi.AD }}"
+                                            data-tc="{{ kredi.TC_PASAPORT }}"
+                                            data-email="{{ kredi.EMAIL }}"
+                                            data-kredi="{{ kredi.KREDI }}"
+                                            data-baslama="{{ kredi.KREDI_BASLAMA }}"
+                                            data-bitis="{{ kredi.KREDI_BITIS }}">
+                                        Güncelle
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            $.datepicker.setDefaults($.datepicker.regional['tr']);
+            $("#kredi_baslama, #kredi_bitis").datepicker({
+                dateFormat: "dd/mm/yy",
+                changeMonth: true,
+                changeYear: true
+            });
+
+            // Güncelle butonu: formu doldur ve set-moduna geçir
+            $('.btn-guncelle').on('click', function () {
+            const btn = $(this);
+            $('#ad').val(btn.data('ad'));
+            $('#tc_pasaport').val(btn.data('tc'));
+            $('#email').val(btn.data('email'));
+            $('#kredi').val(btn.data('kredi'));
+            $('#kredi_baslama').val(btn.data('baslama'));
+            $('#kredi_bitis').val(btn.data('bitis'));
+
+            // Bu kaydın toplam kredi bilgisini SET edeceğiz
+            $('#is_update').val('1');
+
+            // formun başına kaydır
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            $('#ad').focus();
+            });
+        });
+    </script>
+</body>
+</html>

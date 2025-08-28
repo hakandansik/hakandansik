@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rezervasyon Düzenle</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/i18n/datepicker-tr.min.js"></script>
+</head>
+<body style="background-color: #f8f9fa;">
+    <div class="container py-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="text-center mb-0">Rezervasyon Düzenle</h3>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="ad">Ad</label>
+                            <input type="text" class="form-control" id="ad" name="ad" value="{{ rezervasyon['AD'] }}" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="gsm">Telefon</label>
+                            <input type="text" class="form-control" id="gsm" name="gsm" value="{{ rezervasyon['GSM'] }}" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="tc_pasaport">TC/Pasaport No</label>
+                            <input type="text" class="form-control" id="tc_pasaport" name="tc_pasaport" value="{{ rezervasyon['TC_PASAPORT'] }}" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="dogum_tarihi">Doğum Tarihi</label>
+                            <input type="text" class="form-control" id="dogum_tarihi" name="dogum_tarihi" value="{{ rezervasyon['DOGUM_TARIHI'] }}" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sertifika">Sertifika</label>
+                        <input type="text" class="form-control" id="sertifika" name="sertifika" value="{{ rezervasyon['SERTIFIKA'] }}">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="tarih">Rezervasyon Tarihi</label>
+                            <input type="text" class="form-control" id="tarih" name="tarih" value="{{ rezervasyon['TARIH'] }}" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="tur_bilgisi">Tur Bilgisi</label>
+                            <input type="text" class="form-control" id="tur_bilgisi" name="tur_bilgisi" value="{{ rezervasyon['TUR_BILGISI'] }}" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-Posta</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ rezervasyon['EMAIL'] }}" required>
+                    </div>
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-success">Kaydet</button>
+                        <a href="{{ url_for('rezervasyon_list') }}" class="btn btn-secondary">İptal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(function() {
+            $.datepicker.setDefaults($.datepicker.regional['tr']);
+            $("#dogum_tarihi, #tarih").datepicker({
+                dateFormat: "dd/mm/yy",
+                changeMonth: true,
+                changeYear: true
+            });
+        });
+    </script>
+</body>
+</html>
