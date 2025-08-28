@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rezervasyon</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/i18n/datepicker-tr.min.js"></script>
+    <style>
+        .dolu-gun a {
+            background-color: red !important;
+            color: white !important;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <img src="{{ url_for('static', filename='ispermecet.jpg') }}" alt="Logo" style="margin-left: 20px; width: 300px; height: auto;">
+        <h1>Rezervasyon</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert alert-success">
+            {% for category, message in messages %}
+            {{ message }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/submit">
+            <div class="mb-3">
+                <label for="tarih" class="form-label">Tarih Seçimi</label>
+                <input type="text" class="form-control" id="tarih" name="tarih" required>
+                <small class="form-text text-muted" id="kapasiteBilgi">Kapasite bilgisi burada görünecek.</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="adsoyad" class="form-label">Ad Soyad</label>
+                <input type="text" class="form-control" id="adsoyad" name="adsoyad" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="telefon" class="form-label">Cep Telefonu</label>
+                <input type="tel" class="form-control" id="telefon" name="telefon" required pattern="05[0-9]{9}" placeholder="05XXXXXXXXX">
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">E-Posta</label>
+                <input type="email" class="form-control" id="email" name="email"  placeholder="test@example.com">
+            </div>
+
+            <div class="mb-3">
+                <label for="tckimlik" class="form-label">TC Kimlik Numarası / Pasaport Numarasi</label>
+                <input type="text" class="form-control" id="tc_pasaport" name="tc_pasaport" required pattern="[0-9]{11}">
+            </div>
+
+            <div class="mb-3">
+                <label for="dogumtarihi" class="form-label">Doğum Tarihi</label>
+                <input type="text" class="form-control" id="dogumtarihi" name="dogumtarihi" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="adres" class="form-label">Adres</label>
+                <input type="text" class="form-control" id="adres" name="adres" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="sertifika" class="form-label">Dalış Sertifikası</label>
+                <input type="text" class="form-control" id="sertifika" name="sertifika">
+            </div>
+
+            <div class="mb-3">
+                <a href="/kvkk/view" target="_blank">KVKK Aydınlatma ve Açık Rıza Metni’ni okuyunuz.</a>
+                <div class="form-check">
+                    <input type="checkbox" name="kvkk_onay" id="kvkk_onay" value="on" required>
+                    <label class="form-check-label" for="kvkkOnay">
+                        KVKK Aydınlatma Metni ve Açık Rıza Metni’ni okudum, anladım ve onaylıyorum.
+                    </label>
+                </div>
+                <input type="hidden" name="kvkk_onay_tarihi" id="kvkk_onay_tarihi">
+                <input type="hidden" name="kvkk_versiyon" value="v1.0">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Rezervasyon Yap</button>
+        </form>
+    </div>
+
+    <script>
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const kvkkOnay = document.getElementById("kvkkOnay");
+            if (!kvkkOnay.checked) {
+                e.preventDefault();
+                alert("Lütfen KVKK Aydınlatma ve Açık Rıza Metni'ni onaylayınız.");
+            }
+        });
+
+        $(function () {
+            $.datepicker.setDefaults($.datepicker.regional['tr']);
+            let doluGunler = [];
+
+            $.ajax({ url: "/dolu_gunler", method: "GET", success: function (response) {
+                doluGunler = response;
+                initDatepicker();
+            }});
+
+            function initDatepicker() {
+                $("#tarih").datepicker({
+                    dateFormat: "dd/mm/yy",
+                    changeMonth: true,
+                    changeYear: true,
+                    beforeShowDay: function (date) {
+                        let ymd = $.datepicker.formatDate('yy-mm-dd', date);
+                        if (doluGunler.includes(ymd)) {
+                            return [false, "dolu-gun", "Bu gün dolu"];
+                        }
+                        return [true, "", ""];
+                    },
+                    onSelect: function (selectedDate) {
+                        $.ajax({
+                            url: "/kontrol_kapasite",
+                            method: "POST",
+                            contentType: "application/json",
+                            data: JSON.stringify({ tarih: selectedDate }),
+                            success: function (response) {
+                                var kapasiteBilgi = `${response.kayitli}/${response.kapasite} kişi kayıtlı. Müsait kişi sayısı: ${response.musait}`;
+                                $("#kapasiteBilgi").text(kapasiteBilgi);
+                                if (response.musait <= 0) {
+                                    alert("Bu tarihte yer kalmamıştır. Lütfen başka bir tarih seçin.");
+                                    $("#tarih").val("");
+                                }
+                            }
+                        });
+                    }
+                });
+
+                $("#dogumtarihi").datepicker({
+                    dateFormat: "dd/mm/yy",
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "1900:" + new Date().getFullYear(),
+                    minDate: new Date(1900, 0, 1),
+                    maxDate: new Date()
+                });
+            }
+        });
+    document.querySelector("form").addEventListener("submit", function () {
+      document.getElementById("kvkk_onay_tarihi").value = new Date().toISOString();
+    });
+    </script>
+</body>
+</html>
